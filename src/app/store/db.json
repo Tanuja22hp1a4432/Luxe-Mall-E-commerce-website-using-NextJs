@@ -1,0 +1,44 @@
+{
+  "user": {
+    "name": "Alex Johnson",
+    "email": "alex.j@example.com",
+    "phone": "+1 234 567 890",
+    "address": "123 Luxe Lane, Fashion City",
+    "profilePic": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop"
+  },
+  "foodItems": [
+    {
+      "id": 1,
+      "name": "Truffle Pasta",
+      "price": 24.99,
+      "category": "Italian",
+      "image": "https://images.unsplash.com/photo-1523905330026-b8bd1f5f320e?q=80&w=2079&auto=format&fit=crop"
+    },
+    {
+      "id": 2,
+      "name": "Wagyu Burger",
+      "price": 29.99,
+      "category": "American",
+      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1899&auto=format&fit=crop"
+    },
+    {
+      "id": 3,
+      "name": "Dragon Sushi Roll",
+      "price": 18.50,
+      "category": "Japanese",
+      "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1925&auto=format&fit=crop"
+    }
+  ],
+  "categories": [
+    { "id": "womens-wear", "name": "Women's Wear", "api_category": "womens-dresses" },
+    { "id": "mens-wear", "name": "Men's Wear", "api_category": "mens-shirts" },
+    { "id": "kids-wear", "name": "Kids' Wear", "api_category": "mens-shirts" },
+    { "id": "groceries", "name": "Groceries", "api_category": "groceries" },
+    { "id": "furniture", "name": "Furniture", "api_category": "furniture" },
+    { "id": "laptops", "name": "Laptops", "api_category": "laptops" },
+    { "id": "gadgets", "name": "Gadgets", "api_category": "smartphones" },
+    { "id": "gift-articles", "name": "Gift Articles", "api_category": "home-decoration" },
+    { "id": "cakes", "name": "Birthday Cakes", "api_category": "groceries" }
+  ],
+  "notifications": []
+}

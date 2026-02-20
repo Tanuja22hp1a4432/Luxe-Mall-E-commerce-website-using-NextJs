@@ -8,7 +8,9 @@ const NotificationCenter = ({ isOpen, onClose }) => {
     const [notifications, setNotifications] = useState([
         { id: 1, type: 'order', title: 'Order Delivered!', message: 'Your order #ORD-LV99 is now at your doorstep.', time: '2 mins ago', icon: CheckCircle2, color: 'bg-green-50 text-green-600' },
         { id: 2, type: 'promo', title: 'Limited Offer!', message: 'Use code LUXE20 for extra 20% off on all items.', time: '1 hour ago', icon: Ticket, color: 'bg-blue-50 text-blue-600' },
-        { id: 3, type: 'shipping', title: 'On the Way', message: 'Your pizza from Luxe Italy is out for delivery.', time: 'Just now', icon: Truck, color: 'bg-orange-50 text-orange-600' }
+        { id: 3, type: 'shipping', title: 'On the Way', message: 'Your pizza from Luxe Italy is out for delivery.', time: 'Just now', icon: Truck, color: 'bg-orange-50 text-orange-600' },
+        { id: 4, type: 'availability', title: 'Back in Stock!', message: 'The Cotton Tee you wishlisted is now available.', time: '5 mins ago', icon: Bell, color: 'bg-purple-50 text-purple-600' },
+        { id: 5, type: 'luxe_points', title: 'Points Earned', message: 'You earned 50 LuxePoints from your last food order.', time: '10 mins ago', icon: Star, color: 'bg-yellow-50 text-yellow-600' }
     ]);
 
     const removeNotification = (id) => {

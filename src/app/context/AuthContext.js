@@ -97,8 +97,15 @@ export const AuthProvider = ({ children }) => {
     return true;
   };
 
+  const updateUser = (updatedData) => {
+    const updatedUser = { ...user, ...updatedData };
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    toast.success("Profile updated successfully!");
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, requestOTP, verifyOTP, resetPassword }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, requestOTP, verifyOTP, resetPassword, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

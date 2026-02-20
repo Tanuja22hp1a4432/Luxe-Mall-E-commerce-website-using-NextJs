@@ -8,6 +8,7 @@ const ShopContext = createContext();
 export const ShopProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [floatingHearts, setFloatingHearts] = useState([]);
 
   const [orders, setOrders] = useState([]);
 
@@ -28,6 +29,15 @@ export const ShopProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    
+    // Simulate Wishlist Sale Notification
+    const saleItems = wishlist.filter(item => item.discountPercentage > 15);
+    if (saleItems.length > 0 && Math.random() > 0.7) {
+      toast(`Wishlist Alert: ${saleItems[0].title} is now ${Math.round(saleItems[0].discountPercentage)}% OFF!`, {
+        icon: '🔥',
+        duration: 5000
+      });
+    }
   }, [wishlist]);
 
   useEffect(() => {
@@ -89,7 +99,7 @@ export const ShopProvider = ({ children }) => {
     );
   };
 
-  const toggleWishlist = (product) => {
+  const toggleWishlist = (product, e) => {
     const exists = wishlist.find((item) => item.id === product.id);
     if (exists) {
       setWishlist((prev) => prev.filter((item) => item.id !== product.id));
@@ -97,6 +107,20 @@ export const ShopProvider = ({ children }) => {
     } else {
       setWishlist((prev) => [...prev, product]);
       toast("Added to wishlist", { icon: '❤️' });
+      
+      // Trigger floating heart animation
+      const rect = e?.target?.getBoundingClientRect() || { left: window.innerWidth / 2, top: window.innerHeight / 2 };
+      const newHeart = {
+        id: Date.now(),
+        x: e?.clientX || rect.left + rect.width / 2,
+        y: e?.clientY || rect.top + rect.height / 2
+      };
+      setFloatingHearts(prev => [...prev, newHeart]);
+      
+      // Clean up heart after animation
+      setTimeout(() => {
+        setFloatingHearts(prev => prev.filter(h => h.id !== newHeart.id));
+      }, 1000);
     }
   };
 
@@ -118,6 +142,7 @@ export const ShopProvider = ({ children }) => {
         removeFromCart,
         updateQuantity,
         toggleWishlist,
+        floatingHearts,
         clearCart,
         placeOrder,
         requestReturn,

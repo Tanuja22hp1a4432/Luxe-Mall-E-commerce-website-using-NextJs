@@ -10,16 +10,20 @@ import { useRouter } from 'next/navigation';
 import VisualSearchModal from './VisualSearchModal';
 import NotificationCenter from './NotificationCenter';
 
-const categories = [
-  { name: "Men's Wear", path: "/shop?category=mens-shirts" },
-  { name: "Women's Wear", path: "/shop?category=womens-dresses", sub: ["Western", "Dresses", "Traditional"] },
-  { name: "Groceries", path: "/shop?category=groceries" },
-  { name: "Laptops", path: "/shop?category=laptops" },
-  { name: "Furniture", path: "/shop?category=furniture" },
-  { name: "Food", path: "/food", isNew: true },
-];
+import categoriesData from '../store/db.json';
 
 const Header = () => {
+  const [categories, setCategories] = useState([]);
+  
+  useEffect(() => {
+    // Transform db.json categories to header format
+    const formattedCategories = categoriesData.categories.map(cat => ({
+      name: cat.name,
+      path: cat.id === 'food' ? '/food' : `/shop?category=${cat.api_category}`,
+      isNew: cat.id === 'food'
+    }));
+    setCategories(formattedCategories);
+  }, []);
   const { cartCount, wishlist } = useShop();
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
@@ -52,24 +56,24 @@ const Header = () => {
     <>
       <header className="fixed w-full z-50">
       {/* Top Banner */}
-      <div className="bg-gray-900 text-white py-2 text-center text-xs font-medium tracking-wide">
-        FREE SHIPPING ON ALL ORDERS OVER $100 | USE CODE: <span className="text-blue-400 font-bold">LUXE20</span>
+      <div className="bg-blue-600 text-white py-2 text-center text-[10px] font-black tracking-[0.3em] uppercase">
+        FREE SHIPPING ON ALL ORDERS OVER $100 | USE CODE: <span className="text-white underline font-black">LUXE20</span>
       </div>
 
       {/* Main Header */}
-      <div className={`transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : 'bg-white/80 backdrop-blur-md'}`}>
+      <div className={`transition-all duration-500 ${scrolled ? 'bg-black/90 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-b border-white/5' : 'bg-transparent'} backdrop-blur-2xl`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-black tracking-tighter text-gray-900">
-              LUXE<span className="text-blue-600">STORE</span>
+          <div className="flex items-center gap-10">
+            <Link href="/" className="text-3xl font-black tracking-tighter text-white group">
+              LUXE<span className="text-blue-500 group-hover:text-white transition-colors">STORE</span>
             </Link>
             
-            <nav className="hidden lg:flex items-center space-x-6">
-              {categories.slice(0, 4).map((cat) => (
+            <nav className="hidden lg:flex items-center space-x-8">
+              {categories.slice(0, 5).map((cat) => (
                 <div key={cat.name} className="group relative py-2">
-                  <Link href={cat.path} className={`text-sm font-bold transition-colors flex items-center gap-1 ${cat.isNew ? 'text-orange-600 hover:text-orange-700' : 'text-gray-700 hover:text-blue-600'}`}>
+                  <Link href={cat.path} className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${cat.isNew ? 'text-orange-500' : 'text-gray-400 hover:text-white'}`}>
                     {cat.name}
-                    {cat.isNew && <span className="text-[8px] bg-orange-100 px-1.5 py-0.5 rounded-full animate-pulse ml-1">NEW</span>}
+                    {cat.isNew && <span className="text-[8px] bg-orange-500 text-white px-2 py-0.5 rounded-full animate-pulse">NEW</span>}
                     {cat.sub && <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />}
                   </Link>
                   {cat.sub && (
@@ -87,44 +91,43 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-5">
-            {/* Search Bar */}
             <div className="hidden md:flex items-center relative">
               <form onSubmit={handleSearch} className="flex items-center">
                 <input 
                   type="text" 
-                  placeholder="Search products..." 
-                  className="bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-blue-100 w-48 lg:w-64 transition-all focus:w-80"
+                  placeholder="Exploration mode..." 
+                  className="bg-white/5 border border-white/5 rounded-full py-2.5 pl-12 pr-6 text-xs text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 w-48 lg:w-64 transition-all focus:w-80 backdrop-blur-md"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Search size={18} className="absolute left-3 text-gray-400" />
+                <Search size={18} className="absolute left-4 text-gray-500" />
                 <button 
                   type="button"
                   onClick={() => setVisualSearchOpen(true)}
-                  className="absolute right-3 text-gray-400 hover:text-blue-600 transition-colors"
+                  className="absolute right-4 text-gray-500 hover:text-blue-500 transition-colors"
                 >
                   <Camera size={18} />
                 </button>
               </form>
             </div>
 
-            <button className="md:hidden text-gray-700" onClick={() => setSearchOpen(true)}>
+            <button className="md:hidden text-white" onClick={() => setSearchOpen(true)}>
               <Search size={22} />
             </button>
 
-            <Link href="/wishlist" className="relative text-gray-700 hover:text-red-500 transition-colors">
+            <Link href="/wishlist" className="relative text-gray-400 hover:text-red-500 transition-colors">
               <Heart size={22} />
               {wishlist.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-black rounded-full h-4.5 w-4.5 flex items-center justify-center shadow-lg shadow-red-500/30">
                   {wishlist.length}
                 </span>
               )}
             </Link>
 
-            <Link href="/cart" className="relative text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/cart" className="relative text-gray-400 hover:text-blue-500 transition-colors">
               <ShoppingCart size={22} />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-1.5 bg-blue-500 text-white text-[10px] font-black rounded-full h-4.5 w-4.5 flex items-center justify-center shadow-lg shadow-blue-500/30">
                   {cartCount}
                 </span>
               )}
@@ -132,10 +135,10 @@ const Header = () => {
 
             <button 
               onClick={() => setNotificationsOpen(true)}
-              className="relative text-gray-700 hover:text-blue-600 transition-all hover:bg-gray-50 p-2 rounded-xl"
+              className="relative text-gray-400 hover:text-blue-500 transition-all hover:bg-white/5 p-2 rounded-xl"
             >
               <Bell size={22} />
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span>
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-black rounded-full animate-pulse"></span>
             </button>
 
             {user ? (

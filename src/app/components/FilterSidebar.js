@@ -5,25 +5,24 @@ import { Filter, Check, ChevronDown, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
-const categories = [
-  { id: 'all', name: 'All Categories' },
-  { id: 'beauty', name: 'Beauty' },
-  { id: 'fragrances', name: 'Fragrances' },
-  { id: 'furniture', name: 'Furniture' },
-  { id: 'groceries', name: 'Groceries' },
-  { id: 'home-decoration', name: 'Home Decor' },
-  { id: 'kitchen-accessories', name: 'Kitchen' },
-  { id: 'laptops', name: 'Laptops' },
-  { id: 'mobile-accessories', name: 'Gadgets' },
-  { id: 'smartphones', name: 'Phones' },
-  { id: 'skin-care', name: 'Skincare' },
-  { id: 'sports-accessories', name: 'Sports' },
-  { id: 'mens-shirts', name: "Men's Shirts" },
-  { id: 'womens-dresses', name: "Women's Dresses" },
-  { id: 'womens-shoes', name: "Women's Shoes" },
-];
+import categoriesData from '../store/db.json';
 
 const FilterSidebar = ({ filters, onFilterChange, onReset }) => {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // Add "All" option and map other categories
+    const allCats = [
+      { id: 'all', name: 'All Categories' },
+      ...categoriesData.categories.map(cat => ({
+        id: cat.api_category,
+        name: cat.name
+      }))
+    ];
+    // Remove duplicates if any (e.g. multiple items sharing same api_category)
+    const uniqueCats = allCats.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+    setCategories(uniqueCats);
+  }, []);
   const [isOpen, setIsOpen] = useState({
     categories: true,
     price: true,

@@ -5,7 +5,7 @@ import {
     Search, MapPin, Star, Clock, Utensils, 
     Pizza, Burger, Soup, Coffee, ArrowRight,
     ShoppingBag, Trash2, Plus, Minus, CheckCircle2,
-    Bike, Award, ShieldCheck
+    Bike, Award, ShieldCheck, Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -13,9 +13,9 @@ import toast from 'react-hot-toast';
 const categories = [
     { name: 'Pizza', icon: Pizza, color: 'bg-red-50 text-red-600' },
     { name: 'Burgers', icon: Burger, color: 'bg-orange-50 text-orange-600' },
-    { name: 'Sushi', icon: Soup, color: 'bg-purple-50 text-purple-600' },
+    { name: 'Cakes', icon: Utensils, color: 'bg-pink-50 text-pink-600' }, // Changed Sushi to Cakes for request
+    { name: 'Gifts', icon: ShoppingBag, color: 'bg-purple-50 text-purple-600' },
     { name: 'Coffee', icon: Coffee, color: 'bg-brown-50 text-amber-700' },
-    { name: 'Healthy', icon: Utensils, color: 'bg-green-50 text-green-600' },
 ];
 
 const restaurants = [
@@ -34,6 +34,20 @@ const restaurants = [
     },
     {
         id: 2,
+        name: "Celebration Central",
+        rating: 4.9,
+        time: "10-20 min",
+        tag: "Cakes • Gifts • Party Kits",
+        img: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?q=80&w=1888&auto=format&fit=crop",
+        isPromoted: true,
+        menu: [
+            { id: 401, name: "Premium Birthday Cake", price: 25.00, img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=2089&auto=format&fit=crop" },
+            { id: 402, name: "Celebration Kit (Accessories)", price: 15.00, img: "https://images.unsplash.com/photo-1530103043960-ef38714abb15?q=80&w=2070&auto=format&fit=crop" },
+            { id: 403, name: "Luxury Gift Article", price: 45.00, img: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=2030&auto=format&fit=crop" }
+        ]
+    },
+    {
+        id: 3,
         name: "Gourmet Burger Lab",
         rating: 4.9,
         time: "15-25 min",
@@ -44,18 +58,6 @@ const restaurants = [
             { id: 201, name: "Signature Truffle Burger", price: 14.50, img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1965&auto=format&fit=crop" },
             { id: 202, name: "Classic Cheese", price: 9.99, img: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=2015&auto=format&fit=crop" }
         ]
-    },
-    {
-        id: 3,
-        name: "Zen Sushi Bar",
-        rating: 4.7,
-        time: "30-45 min",
-        tag: "Japanese • Sushi",
-        img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=2070&auto=format&fit=crop",
-        isPromoted: true,
-        menu: [
-            { id: 301, name: "Salmon Nigiri Set", price: 18.00, img: "https://images.unsplash.com/photo-1583623025817-d180a2221d0a?q=80&w=2070&auto=format&fit=crop" }
-        ]
     }
 ];
 
@@ -65,6 +67,7 @@ export default function FoodPage() {
     const [cart, setCart] = useState([]);
     const [isCheckout, setIsCheckout] = useState(false);
     const [orderDone, setOrderDone] = useState(false);
+    const [isUrgent, setIsUrgent] = useState(false);
 
     const addToCart = (item, restaurantName) => {
         setCart(prev => {
@@ -91,14 +94,16 @@ export default function FoodPage() {
 
     const handleCheckout = () => {
         setIsCheckout(true);
+        // Urgent delivery reduces simulated time
+        const processTime = isUrgent ? 1500 : 3000;
         setTimeout(() => {
             setOrderDone(true);
             setCart([]);
             setTimeout(() => {
                 setIsCheckout(false);
                 setOrderDone(false);
-            }, 5000);
-        }, 3000);
+            }, 10000); // Keep tracking modal open longer for user to see
+        }, processTime);
     };
 
     return (
@@ -277,7 +282,28 @@ export default function FoodPage() {
                                             </div>
                                             <div className="flex justify-between items-end pt-4 border-t-2 border-dashed border-gray-100">
                                                 <span className="text-xl font-black text-gray-900 uppercase tracking-tighter">Total Price</span>
-                                                <span className="text-3xl font-black text-orange-600">${total.toFixed(2)}</span>
+                                                <span className="text-3xl font-black text-orange-600">${(total + (isUrgent ? 5 : 0)).toFixed(2)}</span>
+                                            </div>
+
+                                            {/* Urgent Delivery Option */}
+                                            <div className="bg-orange-50 p-4 rounded-3xl border border-orange-100 mt-6 group cursor-pointer" onClick={() => setIsUrgent(!isUrgent)}>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`p-2 rounded-xl transition-colors ${isUrgent ? 'bg-orange-600 text-white' : 'bg-white text-orange-600'}`}>
+                                                            <Zap size={16} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Urgent Delivery</p>
+                                                            <p className="text-[8px] font-bold text-orange-600 uppercase tracking-tight">Express 10-15 Min • +$5.00</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className={`w-10 h-5 rounded-full transition-colors relative ${isUrgent ? 'bg-orange-600' : 'bg-gray-200'}`}>
+                                                        <motion.div 
+                                                            animate={{ x: isUrgent ? 20 : 0 }}
+                                                            className="absolute top-1 left-1 w-3 h-3 bg-white rounded-full shadow-sm"
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <button 

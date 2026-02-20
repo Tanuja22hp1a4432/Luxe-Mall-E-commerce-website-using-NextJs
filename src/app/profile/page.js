@@ -7,23 +7,56 @@ import { useRouter } from 'next/navigation';
 import { 
     User, Package, Heart, LogOut, ChevronRight, 
     Calendar, MapPin, CreditCard, ShoppingBag, 
-    RefreshCw, CheckCircle2, Clock, AlertCircle 
+    RefreshCw, CheckCircle2, Clock, AlertCircle,
+    Settings, Camera, Save, Mail, Phone, Edit, ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReturnModal from '../components/ReturnModal';
 
 export default function Profile() {
-  const { user, logout, loading: authLoading } = useAuth();
+  const { user, logout, loading: authLoading, updateUser } = useAuth();
   const { orders, requestReturn, wishlist } = useShop();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('orders');
   const [selectedOrderForReturn, setSelectedOrderForReturn] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
     }
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '+1 234 567 890',
+        address: user.address || '123 Luxe Lane, Fashion City'
+      });
+    }
   }, [user, authLoading, router]);
+
+  const handleUpdateProfile = (e) => {
+    e.preventDefault();
+    updateUser(formData);
+    setIsEditing(false);
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateUser({ avatar: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   if (authLoading || !user) {
     return (
@@ -42,8 +75,12 @@ export default function Profile() {
             <aside className="lg:w-1/3">
                 <div className="bg-white p-10 rounded-[40px] shadow-2xl shadow-gray-200 border border-gray-100 flex flex-col items-center text-center">
                     <div className="relative mb-6">
-                        <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-50 p-1">
-                            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover rounded-full" />
+                        <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-50 p-1 group relative">
+                            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover rounded-full transition-all group-hover:opacity-75" />
+                            <label className="absolute inset-0 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full">
+                                <Camera className="text-white" size={24} />
+                                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                            </label>
                         </div>
                         <div className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-white shadow-sm"></div>
                     </div>
@@ -56,6 +93,12 @@ export default function Profile() {
                             className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-black uppercase tracking-widest text-xs ${activeTab === 'orders' ? 'bg-gray-900 text-white shadow-xl' : 'text-gray-500 hover:bg-gray-50'}`}
                         >
                             <Package size={18} /> Order History
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('settings')}
+                            className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-black uppercase tracking-widest text-xs ${activeTab === 'settings' ? 'bg-gray-900 text-white shadow-xl' : 'text-gray-500 hover:bg-gray-50'}`}
+                        >
+                            <Settings size={18} /> Profile Settings
                         </button>
                         <button 
                             onClick={() => router.push('/wishlist')}
@@ -197,6 +240,104 @@ export default function Profile() {
                                     ))}
                                 </div>
                             )}
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'settings' && (
+                        <motion.div
+                            key="settings"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="space-y-8"
+                        >
+                            <div className="flex justify-between items-end mb-4 px-4">
+                                <h3 className="text-4xl font-black text-gray-900 uppercase tracking-tighter">Profile Settings</h3>
+                                <button 
+                                    onClick={() => setIsEditing(!isEditing)}
+                                    className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-full font-black uppercase tracking-widest text-xs hover:bg-blue-700 transition-all"
+                                >
+                                    {isEditing ? <><ArrowLeft size={16}/> Cancel</> : <><Edit size={16}/> Edit Profile</>}
+                                </button>
+                            </div>
+
+                            <div className="bg-white p-10 rounded-[40px] shadow-2xl shadow-gray-200 border border-gray-100">
+                                <form onSubmit={handleUpdateProfile} className="space-y-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Full Name</label>
+                                            <div className="relative">
+                                                <User className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                                <input 
+                                                    type="text" 
+                                                    disabled={!isEditing}
+                                                    value={formData.name}
+                                                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                                    className="w-full bg-gray-50 border-none rounded-2xl py-5 pl-14 pr-6 font-bold text-gray-900 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-75 disabled:cursor-not-allowed" 
+                                                    placeholder="Enter your name"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Email Address</label>
+                                            <div className="relative">
+                                                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                                <input 
+                                                    type="email" 
+                                                    disabled={!isEditing}
+                                                    value={formData.email}
+                                                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                                    className="w-full bg-gray-50 border-none rounded-2xl py-5 pl-14 pr-6 font-bold text-gray-900 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-75 disabled:cursor-not-allowed" 
+                                                    placeholder="email@example.com"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Phone Number</label>
+                                            <div className="relative">
+                                                <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                                <input 
+                                                    type="tel" 
+                                                    disabled={!isEditing}
+                                                    value={formData.phone}
+                                                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                                    className="w-full bg-gray-50 border-none rounded-2xl py-5 pl-14 pr-6 font-bold text-gray-900 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-75 disabled:cursor-not-allowed" 
+                                                    placeholder="+1 (555) 000-0000"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Shipping Address</label>
+                                            <div className="relative">
+                                                <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                                <input 
+                                                    type="text" 
+                                                    disabled={!isEditing}
+                                                    value={formData.address}
+                                                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                                    className="w-full bg-gray-50 border-none rounded-2xl py-5 pl-14 pr-6 font-bold text-gray-900 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-75 disabled:cursor-not-allowed" 
+                                                    placeholder="Street, City, Country"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {isEditing && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="pt-6"
+                                        >
+                                            <button 
+                                                type="submit"
+                                                className="w-full bg-gray-900 text-white py-5 rounded-3xl font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-black transition-all shadow-xl"
+                                            >
+                                                <Save size={20} /> Save Changes
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </form>
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>

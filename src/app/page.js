@@ -3,33 +3,10 @@
 import { useState, useEffect } from 'react';
 import ProductCard from './components/ProductCard';
 import { fetchProducts } from './utils/api';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ShoppingBag, Clock, ArrowRight, Star, Zap } from 'lucide-react';
-
-const promotions = [
-  {
-    title: "Summer Collection 2026",
-    subtitle: "Up to 50% Off",
-    description: "Experience the ultimate style with our new summer arrivals. Limited time offer.",
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop",
-    color: "from-orange-500 to-red-600"
-  },
-  {
-    title: "Premium Tech Gears",
-    subtitle: "New Arrivals",
-    description: "Upgrade your lifestyle with the latest gadgets and premium tech accessories.",
-    image: "https://images.unsplash.com/photo-1491933382434-500287f9b54b?q=80&w=2000&auto=format&fit=crop",
-    color: "from-blue-600 to-purple-700"
-  },
-  {
-    title: "Home Essentials",
-    subtitle: "Best Deals",
-    description: "Transform your living space with our curated collection of home and pantry essentials.",
-    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=2070&auto=format&fit=crop",
-    color: "from-green-500 to-teal-600"
-  }
-];
+import { ChevronRight, ArrowRight, Star, Zap } from 'lucide-react';
+import HeroCarousel from './components/HeroCarousel';
 
 const categoryData = [
   { id: 'womens-dresses', name: "Women's Wear", img: "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?q=80&w=1886&auto=format&fit=crop", sub: ["Western", "Dresses", "Traditional"] },
@@ -41,7 +18,6 @@ const categoryData = [
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [promoIndex, setPromoIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState({ h: 12, m: 45, s: 30 });
 
   useEffect(() => {
@@ -52,12 +28,6 @@ export default function Home() {
     };
     loadProducts();
 
-    // Promo slider interval
-    const interval = setInterval(() => {
-      setPromoIndex((prev) => (prev + 1) % promotions.length);
-    }, 5000);
-
-    // Countdown timer interval
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev.s > 0) return { ...prev, s: prev.s - 1 };
@@ -67,109 +37,37 @@ export default function Home() {
       });
     }, 1000);
 
-    return () => {
-      clearInterval(interval);
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Dynamic Hero Slider */}
-      <section className="relative h-[650px] overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={promoIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="absolute inset-0"
-          >
-            <div className="absolute inset-0 bg-black/30 z-10"></div>
-            <img 
-              src={promotions[promoIndex].image} 
-              alt={promotions[promoIndex].title} 
-              className="w-full h-full object-cover"
-            />
-            <div className="container mx-auto px-4 h-full flex flex-col justify-center relative z-20">
-              <motion.span 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-white text-lg font-bold mb-4 uppercase tracking-[0.3em]"
-              >
-                {promotions[promoIndex].subtitle}
-              </motion.span>
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-6xl md:text-8xl font-black text-white mb-6 leading-none"
-              >
-                {promotions[promoIndex].title.split(' ')[0]} <br />
-                <span className={`bg-gradient-to-r ${promotions[promoIndex].color} bg-clip-text text-transparent`}>
-                  {promotions[promoIndex].title.split(' ').slice(1).join(' ')}
-                </span>
-              </motion.h1>
-              <motion.p
-                 initial={{ opacity: 0, y: 30 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ delay: 0.4 }}
-                 className="text-xl text-gray-200 max-w-lg mb-10 leading-relaxed"
-              >
-                {promotions[promoIndex].description}
-              </motion.p>
-              <motion.div
-                 initial={{ opacity: 0, y: 30 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ delay: 0.6 }}
-                 className="flex gap-4"
-              >
-                  <Link href="/shop" className="bg-white text-gray-900 px-10 py-4 rounded-full font-black hover:bg-blue-600 hover:text-white transition-all transform hover:scale-105 shadow-2xl flex items-center gap-2">
-                    Shop Now <ShoppingBag size={20} />
-                  </Link>
-                  <Link href="/shop" className="bg-white/10 backdrop-blur-md text-white border border-white/30 px-10 py-4 rounded-full font-black hover:bg-white/20 transition-all">
-                    View Details
-                  </Link>
-              </motion.div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex gap-3">
-          {promotions.map((_, i) => (
-            <button 
-              key={i} 
-              onClick={() => setPromoIndex(i)}
-              className={`h-1.5 transition-all rounded-full ${promoIndex === i ? 'w-12 bg-white' : 'w-4 bg-white/40'}`}
-            />
-          ))}
-        </div>
-      </section>
+    <div className="min-h-screen bg-black text-white">
+      {/* Dynamic Hero Carousel */}
+      <HeroCarousel />
 
       {/* Category Grid */}
       <section className="py-24 container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-black text-gray-900 mb-4">Shop by Category</h2>
-          <p className="text-gray-500 max-w-md mx-auto">Explore our wide range of premium products tailored just for you.</p>
+          <h2 className="text-5xl font-black text-white mb-6 uppercase tracking-tighter">Explore Ecosystem</h2>
+          <p className="text-gray-500 max-w-md mx-auto font-black uppercase tracking-[0.2em] text-[10px]">Curated collections for the modern lifestyle</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categoryData.map((cat, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {categoryData.map((cat) => (
             <motion.div
               key={cat.id}
-              whileHover={{ y: -10 }}
-              className="group relative h-[450px] rounded-3xl overflow-hidden cursor-pointer"
+              whileHover={{ y: -15, scale: 1.02 }}
+              className="group relative h-[550px] rounded-[50px] overflow-hidden cursor-pointer border border-white/5 shadow-2xl"
             >
-              <img src={cat.img} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/20 to-transparent flex flex-col justify-end p-8 text-white">
-                <h3 className="text-2xl font-bold mb-2">{cat.name}</h3>
-                <div className="flex flex-wrap gap-2 mb-6 opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-300">
+              <img src={cat.img} alt={cat.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-125 group-hover:rotate-3" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent flex flex-col justify-end p-10 text-white">
+                <h3 className="text-3xl font-black mb-4 uppercase tracking-tighter">{cat.name}</h3>
+                <div className="flex flex-wrap gap-2 mb-8 opacity-0 group-hover:opacity-100 transition-all translate-y-10 group-hover:translate-y-0 duration-500">
                   {cat.sub.map(s => (
-                    <span key={s} className="text-xs bg-white/20 backdrop-blur-md px-3 py-1 rounded-full">{s}</span>
+                    <span key={s} className="text-[10px] font-black bg-white/10 backdrop-blur-3xl px-4 py-2 rounded-full uppercase tracking-widest border border-white/10">{s}</span>
                   ))}
                 </div>
-                <Link href={`/shop?category=${cat.id}`} className="flex items-center gap-2 font-bold text-sm text-blue-400">
-                  Browse Category <ArrowRight size={16} />
+                <Link href={`/shop?category=${cat.id}`} className="flex items-center gap-3 font-black text-[10px] text-blue-500 uppercase tracking-[0.2em] group/link">
+                  Enter Collection <ArrowRight size={16} className="group-hover/link:translate-x-2 transition-transform" />
                 </Link>
               </div>
             </motion.div>
@@ -178,52 +76,52 @@ export default function Home() {
       </section>
 
       {/* Live Deals Section */}
-      <section className="bg-gray-50 py-20 overflow-hidden">
+      <section className="bg-black/20 py-32 overflow-hidden border-y border-white/5 backdrop-blur-3xl">
         <div className="container mx-auto px-4">
-          <div className="bg-white rounded-[40px] shadow-xl overflow-hidden flex flex-col lg:flex-row">
-            <div className="lg:w-1/3 bg-gray-900 p-12 text-white flex flex-col justify-center relative overflow-hidden">
-              <Zap className="absolute -top-10 -right-10 text-blue-600/20" size={300} />
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 bg-blue-600 text-xs font-bold px-3 py-1 rounded-full mb-6 uppercase tracking-widest">
-                   Flash Sale
+          <div className="bg-white/5 rounded-[60px] border border-white/10 shadow-2xl overflow-hidden flex flex-col lg:flex-row relative">
+            <div className="lg:w-1/3 bg-white/5 p-16 text-white flex flex-col justify-center relative overflow-hidden border-r border-white/10">
+              <Zap className="absolute -top-10 -right-10 text-blue-600/10" size={300} />
+              <div className="relative z-10 text-center lg:text-left">
+                <div className="inline-flex items-center gap-3 bg-blue-600/20 text-blue-500 text-[10px] font-black px-4 py-2 rounded-full mb-8 uppercase tracking-[0.3em] border border-blue-500/30">
+                   Flash Orbit
                 </div>
-                <h2 className="text-4xl font-black mb-6">Deals of the Day</h2>
-                <p className="text-gray-400 mb-10">Don't miss out on these limited-time offers. Grab them before they're gone!</p>
+                <h2 className="text-5xl font-black mb-6 uppercase tracking-tighter">Deals of the Orbit</h2>
+                <p className="text-gray-500 mb-12 font-medium">Limited windows of opportunity. Secure yours before they descend.</p>
                 
-                <div className="flex gap-4 mb-10">
+                <div className="flex justify-center lg:justify-start gap-4 mb-12">
                    {[
                      { label: 'Hrs', val: timeLeft.h },
                      { label: 'Min', val: timeLeft.m },
                      { label: 'Sec', val: timeLeft.s }
                    ].map(t => (
-                     <div key={t.label} className="text-center">
-                       <div className="bg-white/10 backdrop-blur-md w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black mb-1">
+                     <div key={t.label} className="text-center group">
+                       <div className="bg-white/5 border border-white/10 group-hover:border-blue-500/50 transition-all backdrop-blur-3xl w-20 h-20 rounded-[24px] flex items-center justify-center text-3xl font-black mb-2 shadow-inner">
                          {t.val.toString().padStart(2, '0')}
                        </div>
-                       <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider font-mono">{t.label}</span>
+                       <span className="text-[10px] uppercase font-black text-gray-600 tracking-[0.2em]">{t.label}</span>
                      </div>
                    ))}
                 </div>
-                <Link href="/shop" className="group inline-flex items-center gap-2 font-bold text-blue-400 border-b border-blue-400/50 pb-1 hover:border-blue-400 transition-all">
-                  View All Deals <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                <Link href="/shop" className="group inline-flex items-center gap-3 font-black text-blue-500 text-[10px] uppercase tracking-[0.3em] border-b border-blue-500/20 pb-2 hover:border-blue-500 transition-all">
+                  Access All Deals <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" />
                 </Link>
               </div>
             </div>
             
-            <div className="lg:w-2/3 p-12 lg:p-16">
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div className="lg:w-2/3 p-16 lg:p-24 relative">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
                   {products.slice(0, 2).map(product => (
-                    <div key={product.id} className="group">
-                       <div className="relative aspect-square rounded-3xl overflow-hidden mb-6 bg-gray-100 shadow-sm">
-                          <img src={product.thumbnail} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          <div className="absolute top-4 left-4 bg-red-600 text-white font-black px-3 py-1 rounded-full text-sm">
+                    <div key={product.id} className="group relative">
+                       <div className="relative aspect-square rounded-[40px] overflow-hidden mb-8 bg-white/5 border border-white/10 shadow-2xl">
+                          <img src={product.thumbnail} alt={product.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                          <div className="absolute top-6 left-6 bg-red-600 text-white font-black px-4 py-2 rounded-full text-[10px] uppercase tracking-widest shadow-xl">
                              -{Math.round(product.discountPercentage)}%
                           </div>
                        </div>
-                       <h3 className="text-xl font-bold mb-2 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{product.title}</h3>
-                       <div className="flex items-center gap-3">
-                          <span className="text-2xl font-black text-gray-900">${product.price}</span>
-                          <span className="text-lg text-gray-400 line-through">${(product.price / (1 - product.discountPercentage / 100)).toFixed(0)}</span>
+                       <h3 className="text-2xl font-black mb-3 group-hover:text-blue-500 transition-colors uppercase tracking-widest text-white">{product.title}</h3>
+                       <div className="flex items-center gap-4">
+                          <span className="text-3xl font-black text-white">${product.price}</span>
+                          <span className="text-xl text-gray-600 line-through font-bold">${(product.price / (1 - product.discountPercentage / 100)).toFixed(0)}</span>
                        </div>
                     </div>
                   ))}
@@ -234,25 +132,25 @@ export default function Home() {
       </section>
 
       {/* Featured Grid */}
-      <section className="py-24 container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 text-center md:text-left">
+      <section className="py-32 container mx-auto px-4 relative">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8 text-center md:text-left">
             <div>
-                 <h2 className="text-4xl font-black mb-4">Trending Now</h2>
-                 <p className="text-gray-500">Discover the products that everyone's talking about.</p>
+                 <h2 className="text-5xl font-black mb-6 uppercase tracking-tighter text-white">Hyper-Trending</h2>
+                 <p className="text-gray-500 font-black uppercase tracking-[0.2em] text-[10px]">Evolving the standard of curated performance</p>
             </div>
-            <Link href="/shop" className="bg-gray-100 hover:bg-gray-200 px-8 py-3 rounded-full font-bold transition-colors">
-              Explore All Products
+            <Link href="/shop" className="bg-white/5 border border-white/10 hover:bg-white hover:text-black px-12 py-4 rounded-full font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-xl">
+              Launch Full Store
             </Link>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-50 rounded-3xl h-[450px] animate-pulse"></div>
+              <div key={i} className="bg-white/5 border border-white/10 rounded-[40px] h-[550px] animate-pulse"></div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -261,21 +159,30 @@ export default function Home() {
       </section>
       
        {/* Newsletter Section */}
-       <section className="py-24 bg-gray-950 text-white">
+       <section className="py-32 bg-black overflow-hidden relative border-t border-white/5">
             <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto rounded-[60px] bg-gradient-to-br from-blue-600 to-purple-800 p-12 lg:p-20 text-center relative overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+                <div className="max-w-6xl mx-auto rounded-[80px] bg-gradient-to-br from-blue-600/10 to-purple-800/10 border border-white/10 p-16 lg:p-32 text-center relative overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.5)]">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-[150px]"></div>
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-[150px]"></div>
+                    
                     <div className="relative z-10">
-                      <Star className="text-yellow-400 mx-auto mb-8 animate-pulse" size={40} fill="currentColor" />
-                      <h2 className="text-4xl md:text-5xl font-black mb-6">Join the Luxe Collective</h2>
-                      <p className="mb-10 text-blue-100 text-lg max-w-xl mx-auto opacity-80">Be the first to know about new arrivals, private sales, and fashion events.</p>
-                      <form className="max-w-md mx-auto flex flex-col sm:flex-row gap-4">
-                          <input type="email" placeholder="email@example.com" className="flex-grow px-8 py-5 rounded-full text-gray-900 focus:outline-none font-medium shadow-xl" />
-                          <button className="bg-gray-950 text-white px-10 py-5 rounded-full font-black hover:bg-gray-800 transition-all transform hover:scale-105 shadow-xl">
-                            Subscribe
+                      <div className="w-20 h-20 bg-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-10 border border-white/10">
+                        <Star className="text-yellow-400" size={32} fill="currentColor" />
+                      </div>
+                      <h2 className="text-5xl md:text-7xl font-black mb-8 uppercase tracking-tighter text-white">Join the Luxe HUD</h2>
+                      <p className="mb-16 text-gray-400 text-xl max-w-2xl mx-auto font-medium leading-relaxed">Early access to drops, hyper-exclusive events, and the future of the Luxe Collective ecosystem.</p>
+                      
+                      <form className="max-w-xl mx-auto flex flex-col sm:flex-row gap-6">
+                          <input 
+                            type="email" 
+                            placeholder="orbital@connection.com" 
+                            className="flex-grow px-10 py-6 bg-white/5 border border-white/10 rounded-full text-white focus:outline-none focus:border-blue-500 font-black uppercase tracking-[0.2em] text-xs shadow-inner" 
+                          />
+                          <button className="bg-white text-black px-12 py-6 rounded-full font-black uppercase tracking-[0.2em] text-xs hover:bg-blue-600 hover:text-white transition-all transform hover:scale-105 shadow-[0_20px_40px_rgba(255,255,255,0.1)]">
+                            Initiate
                           </button>
                       </form>
-                      <p className="mt-8 text-xs text-white/50">By subscribing, you agree to our Terms of Service & Privacy Policy.</p>
+                      <p className="mt-12 text-[9px] text-gray-600 font-black uppercase tracking-[0.3em]">Protocol active • End-to-end encrypted</p>
                     </div>
                 </div>
             </div>

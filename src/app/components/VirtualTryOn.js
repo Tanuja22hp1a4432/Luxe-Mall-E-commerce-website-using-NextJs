@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { X, Camera, Upload, Sparkles, Loader2, CheckCircle2, Info, ShoppingCart, RefreshCw } from 'lucide-react';
+import { X, Camera, Upload, Sparkles, Loader2, CheckCircle2, Info, ShoppingCart, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../context/ShopContext';
 import toast from 'react-hot-toast';
@@ -29,27 +29,58 @@ const VirtualTryOn = ({ isOpen, onClose, product }) => {
     }
   };
 
+  const [detectedGender, setDetectedGender] = useState(null);
+  const [isGenderMismatch, setIsGenderMismatch] = useState(false);
+  const [isOutOfStock, setIsOutOfStock] = useState(false);
+
   const startProcessing = () => {
     setIsProcessing(true);
     setShowResult(false);
     setIsInvalidImage(false);
+    setIsGenderMismatch(false);
+    setIsOutOfStock(false);
     
+    // Check if product is available first
+    if (product.stock === 0) {
+        setIsOutOfStock(true);
+        setIsProcessing(false);
+        return;
+    }
+
     // Simulate AI Processing & Validation
     setTimeout(() => {
       setIsProcessing(false);
       
-      // Simulated "Human Body Detection" Logic
+      // Simulated "Human Body Detection" & "Gender Identification"
       // In a real scenario, this would be the result of a CV model analysis
-      const isActuallyHuman = Math.random() > 0.15; // 85% success rate for simulation
+      const isActuallyHuman = Math.random() > 0.05; 
+      const genders = ['male', 'female'];
+      const identifiedGender = genders[Math.floor(Math.random() * genders.length)];
+      setDetectedGender(identifiedGender);
       
-      if (isActuallyHuman) {
-        setShowResult(true);
-      } else {
+      if (!isActuallyHuman) {
         setIsInvalidImage(true);
         toast.error('Mismatch Detected: Non-human content.', {
             icon: '⚠️',
             style: { borderRadius: '20px', background: '#333', color: '#fff' }
         });
+        return;
+      }
+
+      // Gender Matching Logic
+      const isWomensProduct = product.category?.includes('womens') || product.title?.toLowerCase().includes('women');
+      const isMensProduct = product.category?.includes('mens') || product.title?.toLowerCase().includes('men');
+
+      const isMismatch = (isWomensProduct && identifiedGender !== 'female') || (isMensProduct && identifiedGender !== 'male');
+
+      if (isMismatch) {
+        setIsGenderMismatch(true);
+        toast.error('Gender Mismatch Detected', {
+            icon: '❌',
+            style: { borderRadius: '20px', background: '#333', color: '#fff' }
+        });
+      } else {
+        setShowResult(true);
       }
     }, 4500);
   };
@@ -184,7 +215,73 @@ const VirtualTryOn = ({ isOpen, onClose, product }) => {
                             </div>
                         )}
 
-                        {/* Mismatch / Error State UI */}
+                        {/* Out of Stock State */}
+                        {isOutOfStock && (
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="absolute inset-0 flex items-center justify-center p-12 bg-gray-900/40 backdrop-blur-md"
+                            >
+                                <div className="bg-white p-12 rounded-[48px] shadow-2xl max-w-sm text-center border-4 border-orange-50">
+                                    <div className="w-20 h-20 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <AlertCircle size={40} />
+                                    </div>
+                                    <h4 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4 leading-none">Product Currently Unavailable</h4>
+                                    <p className="text-sm font-medium text-gray-500 mb-8 leading-relaxed">
+                                        Even though we found a match, this product is currently <span className="text-orange-600 font-bold">out of stock</span>. Would you like to be notified when it's back?
+                                    </p>
+                                    <div className="flex flex-col gap-3">
+                                        <button 
+                                            onClick={() => {toast.success('We will notify you!'); onClose();}}
+                                            className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-orange-700 transition-all shadow-xl"
+                                        >
+                                            Notify Me
+                                        </button>
+                                        <button 
+                                            onClick={onClose}
+                                            className="w-full bg-gray-100 text-gray-600 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-gray-200 transition-all"
+                                        >
+                                            Browse Others
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Gender Mismatch State */}
+                        {isGenderMismatch && (
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="absolute inset-0 flex items-center justify-center p-12 bg-red-500/10 backdrop-blur-md"
+                            >
+                                <div className="bg-white p-12 rounded-[48px] shadow-2xl max-w-sm text-center border-4 border-red-50">
+                                    <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Info size={40} />
+                                    </div>
+                                    <h4 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4 leading-none">Style Mismatch</h4>
+                                    <p className="text-sm font-medium text-gray-500 mb-8 leading-relaxed">
+                                        Our AI has detected that this <span className="text-gray-900 font-bold">{product.category.replace('-', ' ')}</span> might not match your detected profile (<span className="text-blue-600 font-bold">{detectedGender}</span>).
+                                    </p>
+                                    <div className="flex flex-col gap-3">
+                                        <button 
+                                            onClick={() => {setUserPhoto(null); setIsGenderMismatch(false);}}
+                                            className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl"
+                                        >
+                                            Try Another Photo
+                                        </button>
+                                        <button 
+                                            onClick={() => setShowResult(true)}
+                                            className="w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-gray-200 transition-all"
+                                        >
+                                            Try it anyway
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Mismatch / Error State UI (Generic Body detection fail) */}
                         {isInvalidImage && (
                             <motion.div 
                                 initial={{ opacity: 0, scale: 0.9 }}
