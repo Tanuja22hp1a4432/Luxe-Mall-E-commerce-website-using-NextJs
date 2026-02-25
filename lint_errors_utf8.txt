@@ -1,0 +1,64 @@
+﻿node.exe : 
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (:String   
+ ) [], RemoteExce    
+ption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+Oops! Something went 
+wrong! :(
+
+ESLint: 10.0.0
+
+Error [ERR_MODULE_NOT
+_FOUND]: Cannot find 
+module 'C:\Users\User
+\Downloads\E-Commerce
+\E-Commerce\my-ecomme
+rce-site\node_modules
+\eslint-config-next\c
+ore-web-vitals' 
+imported from C:\User
+s\User\Downloads\E-Co
+mmerce\E-Commerce\my-
+ecommerce-site\eslint
+.config.mjs
+    at 
+finalizeResolution (n
+ode:internal/modules/
+esm/resolve:274:11)
+    at moduleResolve 
+(node:internal/module
+s/esm/resolve:864:10)
+    at 
+defaultResolve (node:
+internal/modules/esm/
+resolve:990:11)
+    at #cachedDefault
+Resolve (node:interna
+l/modules/esm/loader:
+757:20)
+    at 
+ModuleLoader.resolve 
+(node:internal/module
+s/esm/loader:734:38)
+    at ModuleLoader.g
+etModuleJobForImport 
+(node:internal/module
+s/esm/loader:317:38)
+    at #link (node:in
+ternal/modules/esm/mo
+dule_job:208:49)

@@ -93,35 +93,35 @@ function ShopContent() {
   };
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-black min-h-screen text-white">
       {/* Shop Header */}
-      <div className="bg-gray-50 border-b border-gray-100 py-12">
+      <div className="bg-white/5 border-b border-white/5 py-12 backdrop-blur-3xl">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
-                <Link href="/" className="hover:text-blue-600">Home</Link>
+              <nav className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">
+                <Link href="/" className="hover:text-blue-500 transition-colors">Home</Link>
                 <span>/</span>
-                <span className="text-gray-900">Shop</span>
+                <span className="text-white">Shop</span>
               </nav>
-              <h1 className="text-4xl font-black text-gray-900 uppercase">
+              <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
                 {filters.category ? filters.category.replace('-', ' ') : 'All Collections'}
               </h1>
             </div>
             
-            <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl shadow-sm border border-white/10 backdrop-blur-xl">
                <div className="relative group">
                   <select 
-                    className="appearance-none bg-transparent pl-4 pr-10 py-2 text-sm font-bold text-gray-700 focus:outline-none cursor-pointer"
+                    className="appearance-none bg-transparent pl-4 pr-10 py-2 text-sm font-black text-white focus:outline-none cursor-pointer uppercase tracking-widest"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                   >
-                    <option value="featured">Sort By: Featured</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="rating">Top Rated</option>
+                    <option value="featured" className="bg-black">Sort By: Featured</option>
+                    <option value="price-low" className="bg-black">Price: Low to High</option>
+                    <option value="price-high" className="bg-black">Price: High to Low</option>
+                    <option value="rating" className="bg-black">Top Rated</option>
                   </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                </div>
             </div>
           </div>
@@ -131,18 +131,20 @@ function ShopContent() {
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Desktop Sidebar */}
-          <aside className="hidden lg:block">
-            <FilterSidebar 
-              filters={filters} 
-              onFilterChange={handleFilterChange} 
-              onReset={resetFilters} 
-            />
+          <aside className="hidden lg:block w-72 flex-shrink-0">
+            <div className="sticky top-32">
+              <FilterSidebar 
+                filters={filters} 
+                onFilterChange={handleFilterChange} 
+                onReset={resetFilters} 
+              />
+            </div>
           </aside>
 
           {/* Mobile Filter Button */}
           <button 
             onClick={() => setShowMobileFilters(true)}
-            className="lg:hidden flex items-center justify-center gap-2 bg-gray-900 text-white w-full py-4 rounded-2xl font-black uppercase tracking-widest mb-8"
+            className="lg:hidden flex items-center justify-center gap-3 bg-white text-black w-full py-5 rounded-[24px] font-black uppercase tracking-widest mb-8 hover:bg-blue-600 hover:text-white transition-all shadow-2xl"
           >
             <SlidersHorizontal size={20} /> Filters & Sorting
           </button>
@@ -150,30 +152,30 @@ function ShopContent() {
           {/* Product Grid */}
           <main className="flex-grow">
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10">
                 {[...Array(9)].map((_, i) => (
-                  <div key={i} className="bg-gray-50 rounded-[32px] aspect-[4/5] animate-pulse"></div>
+                  <div key={i} className="bg-white/5 border border-white/10 rounded-[40px] aspect-[4/5] animate-pulse"></div>
                 ))}
               </div>
             ) : filteredProducts.length > 0 ? (
               <>
-                <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8 flex justify-between items-center">
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-10 flex justify-between items-center px-2">
                    <span>Showing {filteredProducts.length} Results</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10">
                   {filteredProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               </>
             ) : (
-              <div className="text-center py-24 bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
-                 <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
-                    <Search size={32} className="text-gray-300" />
+              <div className="text-center py-32 bg-white/5 rounded-[60px] border border-white/10 shadow-2xl">
+                 <div className="inline-flex items-center justify-center w-24 h-24 bg-white/5 border border-white/10 rounded-full mb-8">
+                    <Search size={40} className="text-gray-700" />
                  </div>
-                 <h2 className="text-2xl font-black text-gray-900 mb-2">No Products Found</h2>
-                 <p className="text-gray-500 mb-8">Try adjusting your filters or search query to find what you're looking for.</p>
-                 <button onClick={resetFilters} className="bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                 <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-tighter">No Products Found</h2>
+                 <p className="text-gray-500 mb-12 max-w-sm mx-auto font-medium">Try adjusting your filters or search query to find what you're looking for.</p>
+                 <button onClick={resetFilters} className="bg-white text-black px-12 py-4 rounded-full font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl">
                     Clear All Filters
                  </button>
               </div>
@@ -190,7 +192,7 @@ function ShopContent() {
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
-               className="fixed inset-0 bg-black/50 z-[60] backdrop-blur-sm lg:hidden" 
+               className="fixed inset-0 bg-black/80 z-[100] backdrop-blur-md lg:hidden" 
                onClick={() => setShowMobileFilters(false)}
             />
             <motion.div
@@ -198,11 +200,11 @@ function ShopContent() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-0 h-full w-4/5 max-w-sm bg-white z-[70] shadow-2xl p-6 overflow-y-auto lg:hidden"
+              className="fixed right-0 top-0 h-full w-4/5 max-w-sm bg-black border-l border-white/10 z-[110] shadow-2xl p-10 overflow-y-auto lg:hidden"
             >
-               <div className="flex justify-between items-center mb-8">
-                  <span className="text-xl font-black">FILTERS</span>
-                  <button onClick={() => setShowMobileFilters(false)} className="p-2 text-gray-500">
+               <div className="flex justify-between items-center mb-12">
+                  <span className="text-2xl font-black text-white uppercase tracking-tighter">FILTERS</span>
+                  <button onClick={() => setShowMobileFilters(false)} className="p-2 text-white/50 hover:text-white transition-colors">
                     <X size={24} />
                   </button>
                </div>
@@ -213,7 +215,7 @@ function ShopContent() {
                />
                <button 
                   onClick={() => setShowMobileFilters(false)}
-                  className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest mt-8 shadow-xl"
+                  className="w-full bg-white text-black py-5 rounded-[24px] font-black uppercase tracking-widest mt-12 shadow-xl hover:bg-blue-600 hover:text-white transition-all"
                >
                   Apply Filters
                </button>
@@ -222,6 +224,7 @@ function ShopContent() {
         )}
       </AnimatePresence>
     </div>
+
   );
 }
 
